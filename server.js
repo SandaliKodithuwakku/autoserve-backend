@@ -2,9 +2,10 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { protect } = require('./middleware/authMiddleware');
 
 // Import routes
-// const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes');
 // const bookingRoutes = require('./routes/bookingRoutes');
 // const serviceRoutes = require('./routes/serviceRoutes');
 
@@ -22,13 +23,22 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // app.use('/api/bookings', bookingRoutes);
 // app.use('/api/services', serviceRoutes);
 
 // Test route
 app.get('/', (req, res) => {
   res.json({ message: 'AutoServe API is running!' });
+});
+
+// Test protected route
+app.get('/api/test/me', protect, (req, res) => {
+  res.json({
+    success: true,
+    message: 'Authentication working!',
+    user: req.user
+  });
 });
 
 // Start server

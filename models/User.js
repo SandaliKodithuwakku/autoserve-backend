@@ -12,6 +12,19 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a password']
   },
+  role: {
+    type: String,
+    enum: ['admin', 'customer'],
+    default: 'customer'
+  },
+  email: {
+    type: String,
+    lowercase: true,
+    trim: true
+  },
+  phone: {
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now
