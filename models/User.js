@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
   phone: {
     type: String
   },
+  resetPasswordToken: {
+    type: String
+  },
+  resetPasswordExpire: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now
