@@ -29,6 +29,7 @@ const bookingSchema = new mongoose.Schema({
   },
   serviceType: {
     type: String,
+    ref: 'Service',
     required: [true, 'Please add service type']
   },
   date: {

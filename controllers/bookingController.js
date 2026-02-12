@@ -39,6 +39,9 @@ const createBooking = async (req, res) => {
       status: 'Pending'
     });
 
+    // Populate serviceType before returning
+    await booking.populate('serviceType');
+
     res.status(201).json({
       success: true,
       booking
@@ -51,9 +54,10 @@ const createBooking = async (req, res) => {
 // Get all bookings (Admin only)
 const getAllBookings = async (req, res) => {
   try {
-    // Fetch all bookings with customer user details
+    // Fetch all bookings with customer user details and service details
     const bookings = await Booking.find()
       .populate('customerUserId', 'username email')
+      .populate('serviceType')
       .sort({ createdAt: -1 });
 
     res.json({
@@ -70,7 +74,8 @@ const getAllBookings = async (req, res) => {
 const getBookingById = async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
-      .populate('customerUserId', 'username email');
+      .populate('customerUserId', 'username email')
+      .populate('serviceType');
 
     // Check if booking exists
     if (!booking) {
@@ -94,8 +99,9 @@ const getBookingById = async (req, res) => {
 // Get my bookings (Authenticated customers only)
 const getMyBookings = async (req, res) => {
   try {
-    // Get all bookings for logged-in customer
+    // Get all bookings for logged-in customer with service details
     const bookings = await Booking.find({ customerUserId: req.user._id })
+      .populate('serviceType')
       .sort({ createdAt: -1 });
 
     res.json({
@@ -114,10 +120,10 @@ const updateBookingStatus = async (req, res) => {
     const { status } = req.body;
 
     // Validate status value
-    const validStatuses = ['Pending', 'Approved', 'Completed', 'Rejected'];
+    const validStatuses = ['Pending', 'Approved', 'Completed', 'Cancelled'];
     if (!status || !validStatuses.includes(status)) {
       return res.status(400).json({
-        message: 'Please provide a valid status: Pending, Approved, Completed, or Rejected'
+        message: 'Please provide a valid status: Pending, Approved, Completed, or Cancelled'
       });
     }
 
@@ -126,7 +132,9 @@ const updateBookingStatus = async (req, res) => {
       req.params.id,
       { status },
       { new: true, runValidators: true }
-    ).populate('customerUserId', 'username email');
+    )
+      .populate('customerUserId', 'username email')
+      .populate('serviceType');
 
     // Check if booking exists
     if (!booking) {
@@ -169,4 +177,3 @@ module.exports = {
   updateBookingStatus,
   deleteBooking
 };
-
